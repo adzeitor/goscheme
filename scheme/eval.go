@@ -101,16 +101,10 @@ func evalList(list []sexpr.Expr, env Environment) (sexpr.Expr, Environment) {
 		cdr, env := eval(list[2], env)
 		// FIXME: optmize and allocate once
 		l := sexpr.List(car)
+		// FIXME: second argument can be pair...
+		// For example, (cons 4 5)  => (4 . 5)
 		l = append(l.([]sexpr.Expr), cdr.([]sexpr.Expr)...)
 		return l, env
-	case sexpr.Symbol("cdr"):
-		arg, env := eval(list[1], env)
-		// FIXME: panic and copy?
-		return arg.([]sexpr.Expr)[1:], env
-	case sexpr.Symbol("car"):
-		arg, env := eval(list[1], env)
-		// FIXME: panic and copy?
-		return arg.([]sexpr.Expr)[0], env
 	case sexpr.Symbol("lambda"):
 		return Lambda{
 			Env:        env.Copy(),

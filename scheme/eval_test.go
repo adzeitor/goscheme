@@ -156,4 +156,17 @@ func TestEval(t *testing.T) {
 	t.Run("error on applying non-lambda", func(t *testing.T) {
 		assert.Equal(t, `exception: The object "+" is not applicable.`, Eval(`("+" 1 2)`))
 	})
+
+	t.Run("error on applying car/cdr to wrong types", func(t *testing.T) {
+		assert.Equal(
+			t,
+			`exception: The object 1, passed as the first argument to car, is not the correct type.`,
+			Eval(`(car 1)`),
+		)
+		assert.Equal(
+			t,
+			`exception: The object "foo", passed as the first argument to cdr, is not the correct type.`,
+			Eval(`(cdr "foo")`),
+		)
+	})
 }
