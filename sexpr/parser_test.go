@@ -29,6 +29,19 @@ func TestParse(t *testing.T) {
 			result: Symbol("foo"),
 		},
 		{
+			in:     `'foo`,
+			result: List(Symbol("quote"), Symbol("foo")),
+		},
+		{
+			in:     `'(1 2 3)`,
+			result: List(Symbol("quote"), List(1, 2, 3)),
+		},
+		{
+			name:   "quote of quoted list",
+			in:     `'(1 '(2 3))`,
+			result: List(Symbol("quote"), List(1, List(Symbol("quote"), List(2, 3)))),
+		},
+		{
 			in:     `#t`,
 			result: true,
 		},

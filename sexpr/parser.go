@@ -90,7 +90,19 @@ func parseList(s string) (value Expr, remains string, ok bool) {
 	return list, remains, ok
 }
 
+func parseQuotedExpr(s string) (value Expr, remains string, ok bool) {
+	s, ok = skipRune(s, `'`)
+	if !ok {
+		return
+	}
+	innerExpr, remains, ok := Parse(s)
+	if !ok {
+		return nil, s, false
+	}
+	return List(Symbol("quote"), innerExpr), remains, true
+}
+
 func Parse(s string) (value Expr, remains string, ok bool) {
 	s, _ = skipManyRune(s, whitespace)
-	return oneOf(parseInt, parseSymbol, parseBool, parseString, parseList)(s)
+	return oneOf(parseInt, parseQuotedExpr, parseSymbol, parseBool, parseString, parseList)(s)
 }

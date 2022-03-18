@@ -44,12 +44,12 @@ func TestEval(t *testing.T) {
 
 	t.Run("equal", func(t *testing.T) {
 		assert.Equal(t, false, Eval(`(= 1 "1")`))
-		assert.Equal(t, false, Eval(`(= (quote foo) "foo")`))
+		assert.Equal(t, false, Eval(`(= 'foo "foo")`))
 		assert.Equal(t, true, Eval(`(= () ())`))
-		assert.Equal(t, true, Eval(`(= (quote (3 4 5)) (quote (3 4 5)))`))
-		assert.Equal(t, false, Eval(`(= (quote (3 4 5)) (quote (3 4 5 6)))`))
-		assert.Equal(t, false, Eval(`(= (quote ()) (quote (3)))`))
-		assert.Equal(t, false, Eval(`(= (quote (3)) (quote ()))`))
+		assert.Equal(t, true, Eval(`(= '(3 4 5) '(3 4 5))`))
+		assert.Equal(t, false, Eval(`(= '(3 4 5) '(3 4 5 6))`))
+		assert.Equal(t, false, Eval(`(= () '(3))`))
+		assert.Equal(t, false, Eval(`(= '(3) ())`))
 	})
 
 	t.Run("if", func(t *testing.T) {
@@ -69,8 +69,8 @@ func TestEval(t *testing.T) {
 			sexpr.List(2, 3),
 			Eval(`(cdr (quote (1 2 3)))`),
 		)
-		assert.Equal(t, true, Eval(`(= 1 (car (cons 1 (quote (2 3)))))`))
-		assert.Equal(t, true, Eval(`(= 2 (car (cdr (cons 1 (quote (2 3))))))`))
+		assert.Equal(t, true, Eval(`(= 1 (car (cons 1 '(2 3))))`))
+		assert.Equal(t, true, Eval(`(= 2 (car (cdr (cons 1 '(2 3)))))`))
 	})
 
 	t.Run("quotes", func(t *testing.T) {
@@ -84,6 +84,14 @@ func TestEval(t *testing.T) {
 			5,
 			Eval(`(quote 5)`),
 		)
+		assert.Equal(
+			t,
+			true,
+			Eval(`
+				(=
+					'(+ '(4 5 6))
+					(quote (+ (quote (4 5 6)))))
+			`))
 	})
 
 	t.Run("with variables", func(t *testing.T) {
