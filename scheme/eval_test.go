@@ -41,7 +41,7 @@ func TestEval(t *testing.T) {
 
 	t.Run("equal", func(t *testing.T) {
 		assert.Equal(t, false, Eval(`(= 1 "1")`))
-		assert.Equal(t, false, Eval(`(= foo "foo")`))
+		assert.Equal(t, false, Eval(`(= (quote foo) "foo")`))
 		assert.Equal(t, true, Eval(`(= () ())`))
 		assert.Equal(t, true, Eval(`(= (quote (3 4 5)) (quote (3 4 5)))`))
 		assert.Equal(t, false, Eval(`(= (quote (3 4 5)) (quote (3 4 5 6)))`))
@@ -144,5 +144,9 @@ func TestEval(t *testing.T) {
 
 		// assert
 		assert.Equal(t, 120, Eval(`(fact 5)`))
+	})
+
+	t.Run("error on unbound variable", func(t *testing.T) {
+		assert.Equal(t, "exception: Unbound variable: foo", Eval(`foo`))
 	})
 }

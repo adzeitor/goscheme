@@ -164,10 +164,11 @@ func eval(expr sexpr.Expr, env Environment) (sexpr.Expr, Environment) {
 	case string:
 		return value, env
 	case sexpr.Symbol:
-		// FIXME: what if not defined?
-		if v := env[value]; v != nil {
-			return v, env
+		v := env[value]
+		if v == nil {
+			panic("Unbound variable: " + value)
 		}
+		return v, env
 	case []sexpr.Expr:
 		return evalList(value, env)
 	}
