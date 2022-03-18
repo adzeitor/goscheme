@@ -162,6 +162,8 @@ func eval(expr sexpr.Expr, env Environment) (sexpr.Expr, Environment) {
 		return value, env
 	case string:
 		return value, env
+	case bool:
+		return value, env
 	case sexpr.Symbol:
 		v := env[value]
 		if v == nil {

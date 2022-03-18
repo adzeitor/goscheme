@@ -37,6 +37,9 @@ func TestEval(t *testing.T) {
 	t.Run("boolean", func(t *testing.T) {
 		assert.Equal(t, true, Eval(`(= 3 3)`))
 		assert.Equal(t, false, Eval(`(= 3 4)`))
+		assert.Equal(t, false, Eval(`(= #t #f)`))
+		assert.Equal(t, true, Eval(`(= #t #t)`))
+		assert.Equal(t, true, Eval(`(= #f #f)`))
 	})
 
 	t.Run("equal", func(t *testing.T) {
