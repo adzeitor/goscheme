@@ -71,14 +71,12 @@ func evalList(list []sexpr.Expr, env Environment) (sexpr.Expr, Environment) {
 	}
 	head := list[0]
 
-	// FIXME: add cons?
 	switch head {
 	case sexpr.Symbol("quote"):
 		return list[1], env
 	case sexpr.Symbol("="):
 		value1, _ := eval(list[1], env)
 		value2, _ := eval(list[2], env)
-		// FIXME: recursive lists comparison?
 		return sexpr.Equal(value1, value2), env
 	case sexpr.Symbol("null?"):
 		arg, env := eval(list[1], env)
@@ -128,8 +126,9 @@ func evalList(list []sexpr.Expr, env Environment) (sexpr.Expr, Environment) {
 	case Lambda:
 		arguments, env := evalArguments(list[1:], env)
 		return applyLambda(head.(Lambda), arguments, env)
+	default:
+		panic(fmt.Sprintf("The object %v is not applicable.", sexpr.Print(head)))
 	}
-	return nil, env
 }
 
 type Environment map[sexpr.Symbol]sexpr.Expr

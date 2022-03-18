@@ -149,4 +149,8 @@ func TestEval(t *testing.T) {
 	t.Run("error on unbound variable", func(t *testing.T) {
 		assert.Equal(t, "exception: Unbound variable: foo", Eval(`foo`))
 	})
+
+	t.Run("error on applying non-lambda", func(t *testing.T) {
+		assert.Equal(t, `exception: The object "+" is not applicable.`, Eval(`("+" 1 2)`))
+	})
 }
