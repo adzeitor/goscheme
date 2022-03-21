@@ -9,6 +9,11 @@ import (
 const whitespace = " \n\t"
 
 func parseInt(s string) (value Expr, remains string, ok bool) {
+	sign := 1
+	signStr, s, ok := oneOf(matchString("+"), matchString("-"))(s)
+	if signStr == "-" {
+		sign = -1
+	}
 	var accum string
 	for _, c := range []rune(s) {
 		if !unicode.IsDigit(c) {
@@ -17,8 +22,12 @@ func parseInt(s string) (value Expr, remains string, ok bool) {
 		ok = true
 		accum = accum + string(c)
 	}
+	if accum == "" {
+		return 0, s, false
+	}
+
 	n, _ := strconv.Atoi(accum)
-	return n, s[len(accum):], ok
+	return sign * n, s[len(accum):], ok
 }
 
 func parseSymbol(s string) (value Expr, remains string, ok bool) {

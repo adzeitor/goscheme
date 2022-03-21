@@ -10,8 +10,8 @@ import (
 
 func TestEval(t *testing.T) {
 	t.Run("eval int value", func(t *testing.T) {
-		got := Eval(`42`)
-		assert.Equal(t, 42, got)
+		assert.Equal(t, 42, Eval(`42`))
+		assert.Equal(t, -13, Eval(`-13`))
 	})
 
 	t.Run("eval int builtin function", func(t *testing.T) {

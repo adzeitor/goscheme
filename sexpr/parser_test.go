@@ -17,12 +17,30 @@ func TestParse(t *testing.T) {
 			result: 5,
 		},
 		{
+			in:     `-42`,
+			result: -42,
+		},
+		{
+			in:     `+42`,
+			result: 42,
+		},
+		{
 			in:     `"foo"`,
 			result: "foo",
 		},
 		{
 			in:     `""`,
 			result: "",
+		},
+		{
+			name:   "operator +",
+			in:     `+`,
+			result: Symbol("+"),
+		},
+		{
+			name:   "operator -",
+			in:     `-`,
+			result: Symbol("-"),
 		},
 		{
 			in:     `foo`,
