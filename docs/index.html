@@ -19,7 +19,7 @@
                     log.innerHTML += `<code>> ${line}</code><br><code>${result}</code><hr>`
                 }
 				input.addEventListener("keydown", function(event) {
-					if (event.key === "Enter") {
+					if (event.key === "Enter" && event.ctrlKey) {
 						event.preventDefault();
                         eval()
 					}
@@ -32,17 +32,15 @@
 		</script>
 	</head>
 	<body>
-		<h3>go scheme online REPL</h3>
-		<ul id="log"></ul>
-		<input id="line"
-               type="text"
-               autofocus
-               placeholder="enter scheme expression"
-               value="(define fact
-				(lambda (n)
-					(if (= n 0)
-						1
-						(* n (fact (- n 1))))))"/>
-        <button id="submit">eval</button>
+        <h3>go scheme online REPL</h3>
+        <ul id="log"></ul>
+        <textarea id="line" autofocus>
+          (define fact
+            (lambda (n)
+			  (if (= n 0)
+			      1
+                  (* n (fact (- n 1))))))
+        </textarea>
+        <button id="submit">eval (or CTRL+ENTER)</button>
 	</body>
 </html>
