@@ -57,6 +57,12 @@ func TestEval(t *testing.T) {
 		assert.Equal(t, 0, Eval(`(if (= 3 4) 5 0)`))
 	})
 
+	t.Run("cond", func(t *testing.T) {
+		assert.Equal(t, true, Eval(`(= 5 (cond ((= 3 3) 5) (else 88)))`))
+		assert.Equal(t, true, Eval(`(= 88 (cond ((= 3 6) 5) (else 88)))`))
+		assert.Equal(t, true, Eval(`(= 88 (cond ((= 3 4) 5) (#f 16) (#t 88)))`))
+	})
+
 	t.Run("null?", func(t *testing.T) {
 		assert.Equal(t, true, Eval(`(null? ())`))
 		assert.Equal(t, false, Eval(`(null? (quote (1)))`))

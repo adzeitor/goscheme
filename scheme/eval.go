@@ -105,6 +105,8 @@ func evalList(list []sexpr.Expr, env Environment) (sexpr.Expr, Environment) {
 		// For example, (cons 4 5)  => (4 . 5)
 		l = append(l.([]sexpr.Expr), cdr.([]sexpr.Expr)...)
 		return l, env
+	case sexpr.Symbol("cond"):
+		return evalCond(list[1:], env)
 	case sexpr.Symbol("lambda"):
 		return Lambda{
 			Env:        env.Copy(),
@@ -123,6 +125,20 @@ func evalList(list []sexpr.Expr, env Environment) (sexpr.Expr, Environment) {
 	default:
 		panic(fmt.Sprintf("The object %v is not applicable.", sexpr.Print(head)))
 	}
+}
+
+func evalCond(conditions []sexpr.Expr, env Environment) (sexpr.Expr, Environment) {
+	for _, clause := range conditions {
+		if clause.([]sexpr.Expr)[0] == sexpr.Symbol("else") {
+			return eval(clause.([]sexpr.Expr)[1], env)
+		}
+
+		match, env := eval(clause.([]sexpr.Expr)[0], env)
+		if match == true {
+			return eval(clause.([]sexpr.Expr)[1], env)
+		}
+	}
+	panic("no match in cond")
 }
 
 type Environment map[sexpr.Symbol]sexpr.Expr
