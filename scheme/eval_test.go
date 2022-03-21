@@ -73,6 +73,14 @@ func TestEval(t *testing.T) {
 		assert.Equal(t, true, Eval(`(= 2 (car (cdr (cons 1 '(2 3)))))`))
 	})
 
+	t.Run("list?", func(t *testing.T) {
+		assert.Equal(t, true, Eval(`(= #t (list? '(4 5 6)))`))
+		assert.Equal(t, true, Eval(`(= #t (list? ()))`))
+		assert.Equal(t, true, Eval(`(= #f (list? 5))`))
+		assert.Equal(t, true, Eval(`(= #f (list? 'foo))`))
+		assert.Equal(t, true, Eval(`(= #f (list? "bar"))`))
+	})
+
 	t.Run("quotes", func(t *testing.T) {
 		assert.Equal(
 			t,
