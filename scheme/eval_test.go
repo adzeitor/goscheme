@@ -81,6 +81,15 @@ func TestEval(t *testing.T) {
 		assert.Equal(t, true, Eval(`(= #f (list? "bar"))`))
 	})
 
+	t.Run("symbol?", func(t *testing.T) {
+		assert.Equal(t, true, Eval(`(= #f (symbol? '(4 5 6)))`))
+		assert.Equal(t, true, Eval(`(= #f (symbol? ()))`))
+		assert.Equal(t, true, Eval(`(= #f (symbol? 5))`))
+		assert.Equal(t, true, Eval(`(= #t (symbol? 'foo))`))
+		assert.Equal(t, true, Eval(`(= #t (symbol? (quote foo)))`))
+		assert.Equal(t, true, Eval(`(= #f (symbol? "bar"))`))
+	})
+
 	t.Run("quotes", func(t *testing.T) {
 		assert.Equal(
 			t,

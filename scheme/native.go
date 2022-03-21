@@ -13,6 +13,7 @@ func addBultin(env Environment) {
 	env["car"] = Builtin(carBuiltin)
 	env["cdr"] = Builtin(cdrBuiltin)
 	env["list?"] = Builtin(isListBuiltin)
+	env["symbol?"] = Builtin(isSymbolBuiltin)
 }
 
 func plusBuiltin(args []sexpr.Expr, env Environment) (sexpr.Expr, Environment) {
@@ -62,5 +63,11 @@ func cdrBuiltin(args []sexpr.Expr, env Environment) (sexpr.Expr, Environment) {
 func isListBuiltin(args []sexpr.Expr, env Environment) (sexpr.Expr, Environment) {
 	arg, env := eval(args[0], env)
 	_, ok := arg.([]sexpr.Expr)
+	return ok, env
+}
+
+func isSymbolBuiltin(args []sexpr.Expr, env Environment) (sexpr.Expr, Environment) {
+	arg, env := eval(args[0], env)
+	_, ok := arg.(sexpr.Symbol)
 	return ok, env
 }
