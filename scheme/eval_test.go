@@ -166,6 +166,17 @@ func TestEval(t *testing.T) {
 		assert.Equal(t, 40, result)
 	})
 
+	t.Run("apply should not extend scope", func(t *testing.T) {
+		// arrange
+		Eval(`(define hack   (lambda (x) (+ x secret)))`)
+		Eval(`(define safe   (lambda (secret) (hack 23)))`)
+
+		// act
+		result := Eval(`(safe 42)`)
+
+		// assert
+		assert.Equal(t, "exception: Unbound variable: secret", result)
+	})
 	t.Run("recursion", func(t *testing.T) {
 		// arrange
 		Eval(`

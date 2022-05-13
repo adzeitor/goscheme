@@ -7,13 +7,13 @@ import (
 )
 
 func addBultin(env Environment) {
-	env["+"] = Builtin(plusBuiltin)
-	env["-"] = Builtin(minusBuiltin)
-	env["*"] = Builtin(multBuiltin)
-	env["car"] = Builtin(carBuiltin)
-	env["cdr"] = Builtin(cdrBuiltin)
-	env["list?"] = Builtin(isListBuiltin)
-	env["symbol?"] = Builtin(isSymbolBuiltin)
+	env.Global["+"] = Builtin(plusBuiltin)
+	env.Global["-"] = Builtin(minusBuiltin)
+	env.Global["*"] = Builtin(multBuiltin)
+	env.Global["car"] = Builtin(carBuiltin)
+	env.Global["cdr"] = Builtin(cdrBuiltin)
+	env.Global["list?"] = Builtin(isListBuiltin)
+	env.Global["symbol?"] = Builtin(isSymbolBuiltin)
 }
 
 func plusBuiltin(args []sexpr.Expr, env Environment) (sexpr.Expr, Environment) {

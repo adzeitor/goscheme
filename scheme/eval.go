@@ -43,17 +43,16 @@ type Lambda struct {
 }
 
 func (lambda Lambda) MakeArgEnv(arguments []sexpr.Expr) Environment {
-	env := make(Environment)
+	env := EmptyEnvironment()
 	for i, value := range arguments {
 		// FIXME: parametrs out of index
-		env[lambda.Parameters[i].(sexpr.Symbol)] = value
+		env.Local[lambda.Parameters[i].(sexpr.Symbol)] = value
 	}
 	return env
 }
 
 func applyLambda(lambda Lambda, arguments []sexpr.Expr, env Environment) (sexpr.Expr, Environment) {
-	closureEnv := env.Extend(lambda.Env)
-	closureEnv = closureEnv.Extend(lambda.MakeArgEnv(arguments))
+	closureEnv := lambda.Env.Extend(lambda.MakeArgEnv(arguments))
 	return eval(lambda.Body, closureEnv)
 }
 
@@ -94,7 +93,7 @@ func evalList(list []sexpr.Expr, env Environment) (sexpr.Expr, Environment) {
 	case sexpr.Symbol("define"):
 		name := list[1].(sexpr.Symbol)
 		value, _ := eval(list[2], env)
-		env[name] = value
+		env.Global[name] = value
 		return name, env
 	case sexpr.Symbol("cons"):
 		car, env := eval(list[1], env)
@@ -141,27 +140,40 @@ func evalCond(conditions []sexpr.Expr, env Environment) (sexpr.Expr, Environment
 	panic("no match in cond")
 }
 
-type Environment map[sexpr.Symbol]sexpr.Expr
+type Environment struct {
+	Global map[sexpr.Symbol]sexpr.Expr
+	Local  map[sexpr.Symbol]sexpr.Expr
+}
+
+func EmptyEnvironment() Environment {
+	return Environment{
+		Global: make(map[sexpr.Symbol]sexpr.Expr),
+		Local:  make(map[sexpr.Symbol]sexpr.Expr),
+	}
+}
 
 func (env Environment) Copy() Environment {
-	copied := make(Environment, len(env))
-	for k, v := range env {
-		copied[k] = v
+	copiedLocal := make(map[sexpr.Symbol]sexpr.Expr, len(env.Local))
+	for k, v := range env.Local {
+		copiedLocal[k] = v
 	}
-	return copied
+	return Environment{
+		Global: env.Global,
+		Local:  copiedLocal,
+	}
 }
 
 func (env Environment) Extend(extension Environment) Environment {
 	newEnv := env.Copy()
 	// add extension to new environment
-	for k, v := range extension {
-		newEnv[k] = v
+	for k, v := range extension.Local {
+		newEnv.Local[k] = v
 	}
 	return newEnv
 }
 
 func DefaultEnvironment() Environment {
-	env := make(Environment)
+	env := EmptyEnvironment()
 	addBultin(env)
 	return env
 }
@@ -175,11 +187,16 @@ func eval(expr sexpr.Expr, env Environment) (sexpr.Expr, Environment) {
 	case bool:
 		return value, env
 	case sexpr.Symbol:
-		v := env[value]
-		if v == nil {
-			panic("Unbound variable: " + value)
+		v := env.Local[value]
+		if v != nil {
+			return v, env
 		}
-		return v, env
+
+		v = env.Global[value]
+		if v != nil {
+			return v, env
+		}
+		panic("Unbound variable: " + value)
 	case []sexpr.Expr:
 		return evalList(value, env)
 	}
