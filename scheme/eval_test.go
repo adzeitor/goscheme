@@ -180,6 +180,35 @@ func TestEval(t *testing.T) {
 		assert.Equal(t, 120, Eval(`(fact 5)`))
 	})
 
+	// https://www.youtube.com/watch?v=OyfBQmvr2Hc
+	t.Run("most beautiful program ever (meta circular evaluator)", func(t *testing.T) {
+		t.Skip()
+		Eval(`
+			(define eval-expr
+				(lambda (expr env)
+					(cond
+						((symbol? expr) (env expr))
+						((= 'lambda (car expr))
+							(lambda (arg)
+							(eval-expr (car (cdr (cdr expr)))
+								(lambda (y)
+									(if (= (car (car (cdr expr))) y)
+										arg
+										(env y))))))
+						(else
+							((eval-expr (car expr) env)
+								(eval-expr (car (cdr expr)) env))))))
+		`)
+		prog := `
+			(eval-expr '((lambda (n) n) hello)
+				(lambda (arg)
+					(if (= arg 'hello)
+						'hello
+						(lambda (x) 'empty))))
+		`
+		assert.Equal(t, sexpr.Symbol("hello"), Eval(prog))
+	})
+
 	t.Run("error on unbound variable", func(t *testing.T) {
 		assert.Equal(t, "exception: Unbound variable: foo", Eval(`foo`))
 	})
