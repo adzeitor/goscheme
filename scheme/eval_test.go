@@ -240,4 +240,13 @@ func TestEval(t *testing.T) {
 			Eval(`(cdr "foo")`),
 		)
 	})
+
+	// https://stackoverflow.com/questions/526082/in-scheme-whats-the-point-of-set
+}
+
+func assertEval(t *testing.T, prog string) {
+	t.Helper()
+	if Eval(prog) != true {
+		t.Errorf("evaluation should return true")
+	}
 }

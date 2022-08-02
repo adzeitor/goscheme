@@ -115,3 +115,11 @@ func Parse(s string) (value Expr, remains string, ok bool) {
 	s, _ = skipManyRune(s, whitespace)
 	return oneOf(parseInt, parseQuotedExpr, parseSymbol, parseBool, parseString, parseList)(s)
 }
+
+func MustParse(s string) Expr {
+	value, _, ok := Parse(s)
+	if !ok {
+		panic("parsing failed: " + s)
+	}
+	return value
+}

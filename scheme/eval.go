@@ -178,6 +178,10 @@ func DefaultEnvironment() Environment {
 	return env
 }
 
+func EvalSexpr(expr sexpr.Expr) (sexpr.Expr, Environment) {
+	return eval(expr, globalEnvironment)
+}
+
 func eval(expr sexpr.Expr, env Environment) (sexpr.Expr, Environment) {
 	switch value := expr.(type) {
 	case int:
