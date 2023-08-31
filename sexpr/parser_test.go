@@ -47,6 +47,10 @@ func TestParse(t *testing.T) {
 			result: Symbol("foo"),
 		},
 		{
+			in:     `'foo1`,
+			result: List(Symbol("quote"), Symbol("foo1")),
+		},
+		{
 			in:     `'foo`,
 			result: List(Symbol("quote"), Symbol("foo")),
 		},
