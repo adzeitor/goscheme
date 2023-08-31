@@ -94,6 +94,7 @@ func TestEval(t *testing.T) {
 		assert.Equal(t, true, Eval(`(= #t (symbol? 'foo))`))
 		assert.Equal(t, true, Eval(`(= #t (symbol? (quote foo)))`))
 		assert.Equal(t, true, Eval(`(= #f (symbol? "bar"))`))
+		assert.Equal(t, true, Eval(`(= #f (symbol? (quote (a b))))`))
 	})
 
 	t.Run("quotes", func(t *testing.T) {
@@ -130,6 +131,10 @@ func TestEval(t *testing.T) {
 
 	t.Run("simple lambda", func(t *testing.T) {
 		assert.Equal(t, 25, Eval(`((lambda (x) (* x x)) 5)`))
+	})
+
+	t.Run("several arguments lambda", func(t *testing.T) {
+		assert.Equal(t, 33, Eval(`((lambda (x y z)  (+ z (* x y))) 5 6 3)`))
 	})
 
 	t.Run("define lambda", func(t *testing.T) {
@@ -175,8 +180,32 @@ func TestEval(t *testing.T) {
 		result := Eval(`(safe 42)`)
 
 		// assert
-		assert.Equal(t, "exception: Unbound variable: secret", result)
+		assert.Contains(t, result, "exception: Unbound variable: secret")
 	})
+
+	t.Run("original lambda environment should remain after calling function", func(t *testing.T) {
+		// act
+		result := Eval(`
+       ((lambda (y) 
+   			(+ ((lambda (x) y) y)
+               ((lambda (x) y) y)))
+        4)`)
+
+		// assert
+		assert.Equal(t, 8, result)
+	})
+
+	t.Run("can create useless lambda :D", func(t *testing.T) {
+		t.Skip()
+		prog := `
+			(lambda (arg)
+					(if (= arg 'hello)
+						'hi
+						(lambda (x) unbound)))
+		`
+		assert.Equal(t, sexpr.Symbol("hi"), Eval(prog))
+	})
+
 	t.Run("recursion", func(t *testing.T) {
 		// arrange
 		Eval(`
@@ -193,7 +222,6 @@ func TestEval(t *testing.T) {
 
 	// https://www.youtube.com/watch?v=OyfBQmvr2Hc
 	t.Run("most beautiful program ever (meta circular evaluator)", func(t *testing.T) {
-		t.Skip()
 		Eval(`
 			(define eval-expr
 				(lambda (expr env)
@@ -201,7 +229,7 @@ func TestEval(t *testing.T) {
 						((symbol? expr) (env expr))
 						((= 'lambda (car expr))
 							(lambda (arg)
-							(eval-expr (car (cdr (cdr expr)))
+							  (eval-expr (car (cdr (cdr expr)))
 								(lambda (y)
 									(if (= (car (car (cdr expr))) y)
 										arg
@@ -211,17 +239,18 @@ func TestEval(t *testing.T) {
 								(eval-expr (car (cdr expr)) env))))))
 		`)
 		prog := `
-			(eval-expr '((lambda (n) n) hello)
-				(lambda (arg)
-					(if (= arg 'hello)
-						'hello
-						(lambda (x) 'empty))))
+			(eval-expr 
+                '((lambda (n) n) hello)
+				(lambda (arg1)
+					(if (= arg1 'hello)
+						'hi
+						unbound))))
 		`
-		assert.Equal(t, sexpr.Symbol("hello"), Eval(prog))
+		assert.Equal(t, sexpr.Symbol("hi"), Eval(prog))
 	})
 
 	t.Run("error on unbound variable", func(t *testing.T) {
-		assert.Equal(t, "exception: Unbound variable: foo", Eval(`foo`))
+		assert.Contains(t, Eval(`foo`), "exception: Unbound variable: foo")
 	})
 
 	t.Run("error on applying non-lambda", func(t *testing.T) {

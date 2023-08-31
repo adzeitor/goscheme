@@ -45,13 +45,17 @@ type Lambda struct {
 func (lambda Lambda) MakeArgEnv(arguments []sexpr.Expr) Environment {
 	env := EmptyEnvironment()
 	for i, value := range arguments {
-		// FIXME: parametrs out of index
-		env.Local[lambda.Parameters[i].(sexpr.Symbol)] = value
+		// FIXME: parameters out of index
+		parameter, ok := lambda.Parameters[i].(sexpr.Symbol)
+		if !ok {
+			panic(fmt.Sprintf("invalid parameter %v", lambda.Parameters[i]))
+		}
+		env.Local[parameter] = value
 	}
 	return env
 }
 
-func applyLambda(lambda Lambda, arguments []sexpr.Expr, env Environment) (sexpr.Expr, Environment) {
+func applyLambda(lambda Lambda, arguments []sexpr.Expr) (sexpr.Expr, Environment) {
 	closureEnv := lambda.Env.Extend(lambda.MakeArgEnv(arguments))
 	return eval(lambda.Body, closureEnv)
 }
@@ -78,7 +82,7 @@ func evalList(list []sexpr.Expr, env Environment) (sexpr.Expr, Environment) {
 		value2, _ := eval(list[2], env)
 		return sexpr.Equal(value1, value2), env
 	case sexpr.Symbol("null?"):
-		arg, env := eval(list[1], env)
+		arg, _ := eval(list[1], env)
 		if l, ok := arg.([]sexpr.Expr); ok {
 			return len(l) == 0, env
 		}
@@ -92,12 +96,13 @@ func evalList(list []sexpr.Expr, env Environment) (sexpr.Expr, Environment) {
 		}
 	case sexpr.Symbol("define"):
 		name := list[1].(sexpr.Symbol)
-		value, _ := eval(list[2], env)
+		body := list[2]
+		value, _ := eval(body, env)
 		env.Global[name] = value
 		return name, env
 	case sexpr.Symbol("cons"):
-		car, env := eval(list[1], env)
-		cdr, env := eval(list[2], env)
+		car, _ := eval(list[1], env)
+		cdr, _ := eval(list[2], env)
 		// FIXME: optmize and allocate once
 		l := sexpr.List(car)
 		// FIXME: second argument can be pair...
@@ -105,7 +110,8 @@ func evalList(list []sexpr.Expr, env Environment) (sexpr.Expr, Environment) {
 		l = append(l.([]sexpr.Expr), cdr.([]sexpr.Expr)...)
 		return l, env
 	case sexpr.Symbol("cond"):
-		return evalCond(list[1:], env)
+		result, _ := evalCond(list[1:], env)
+		return result, env
 	case sexpr.Symbol("lambda"):
 		return Lambda{
 			Env:        env.Copy(),
@@ -119,8 +125,9 @@ func evalList(list []sexpr.Expr, env Environment) (sexpr.Expr, Environment) {
 	case Builtin:
 		return head.(Builtin)(list[1:], env)
 	case Lambda:
-		arguments, env := evalArguments(list[1:], env)
-		return applyLambda(head.(Lambda), arguments, env)
+		arguments, _ := evalArguments(list[1:], env)
+		result, _ := applyLambda(head.(Lambda), arguments)
+		return result, env
 	default:
 		panic(fmt.Sprintf("The object %v is not applicable.", sexpr.Print(head)))
 	}
@@ -132,7 +139,7 @@ func evalCond(conditions []sexpr.Expr, env Environment) (sexpr.Expr, Environment
 			return eval(clause.([]sexpr.Expr)[1], env)
 		}
 
-		match, env := eval(clause.([]sexpr.Expr)[0], env)
+		match, _ := eval(clause.([]sexpr.Expr)[0], env)
 		if match == true {
 			return eval(clause.([]sexpr.Expr)[1], env)
 		}
