@@ -16,26 +16,26 @@ func addBultin(env Environment) {
 	env.Global["symbol?"] = Builtin(isSymbolBuiltin)
 }
 
-func plusBuiltin(args []sexpr.Expr, env Environment) (sexpr.Expr, Environment) {
-	n1, _ := eval(args[0], env)
-	n2, _ := eval(args[1], env)
-	return n1.(int) + n2.(int), env
+func plusBuiltin(args []sexpr.Expr, env Environment) sexpr.Expr {
+	n1 := eval(args[0], env)
+	n2 := eval(args[1], env)
+	return n1.(int) + n2.(int)
 }
 
-func minusBuiltin(args []sexpr.Expr, env Environment) (sexpr.Expr, Environment) {
-	n1, _ := eval(args[0], env)
-	n2, _ := eval(args[1], env)
-	return n1.(int) - n2.(int), env
+func minusBuiltin(args []sexpr.Expr, env Environment) sexpr.Expr {
+	n1 := eval(args[0], env)
+	n2 := eval(args[1], env)
+	return n1.(int) - n2.(int)
 }
 
-func multBuiltin(args []sexpr.Expr, env Environment) (sexpr.Expr, Environment) {
-	n1, _ := eval(args[0], env)
-	n2, _ := eval(args[1], env)
-	return n1.(int) * n2.(int), env
+func multBuiltin(args []sexpr.Expr, env Environment) sexpr.Expr {
+	n1 := eval(args[0], env)
+	n2 := eval(args[1], env)
+	return n1.(int) * n2.(int)
 }
 
-func carBuiltin(args []sexpr.Expr, env Environment) (sexpr.Expr, Environment) {
-	arg, env := eval(args[0], env)
+func carBuiltin(args []sexpr.Expr, env Environment) sexpr.Expr {
+	arg := eval(args[0], env)
 	list, ok := arg.([]sexpr.Expr)
 	if !ok {
 		panic(
@@ -44,11 +44,11 @@ func carBuiltin(args []sexpr.Expr, env Environment) (sexpr.Expr, Environment) {
 				sexpr.Print(arg),
 			))
 	}
-	return list[0], env
+	return list[0]
 }
 
-func cdrBuiltin(args []sexpr.Expr, env Environment) (sexpr.Expr, Environment) {
-	arg, env := eval(args[0], env)
+func cdrBuiltin(args []sexpr.Expr, env Environment) sexpr.Expr {
+	arg := eval(args[0], env)
 	list, ok := arg.([]sexpr.Expr)
 	if !ok {
 		panic(
@@ -57,17 +57,17 @@ func cdrBuiltin(args []sexpr.Expr, env Environment) (sexpr.Expr, Environment) {
 				sexpr.Print(arg),
 			))
 	}
-	return list[1:], env
+	return list[1:]
 }
 
-func isListBuiltin(args []sexpr.Expr, env Environment) (sexpr.Expr, Environment) {
-	arg, env := eval(args[0], env)
+func isListBuiltin(args []sexpr.Expr, env Environment) sexpr.Expr {
+	arg := eval(args[0], env)
 	_, ok := arg.([]sexpr.Expr)
-	return ok, env
+	return ok
 }
 
-func isSymbolBuiltin(args []sexpr.Expr, env Environment) (sexpr.Expr, Environment) {
-	arg, env := eval(args[0], env)
+func isSymbolBuiltin(args []sexpr.Expr, env Environment) sexpr.Expr {
+	arg := eval(args[0], env)
 	_, ok := arg.(sexpr.Symbol)
-	return ok, env
+	return ok
 }
