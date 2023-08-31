@@ -10,7 +10,7 @@ const whitespace = " \n\t"
 
 func parseInt(s string) (value Expr, remains string, ok bool) {
 	sign := 1
-	signStr, s, ok := oneOf(matchString("+"), matchString("-"))(s)
+	signStr, s, _ := oneOf(matchString("+"), matchString("-"))(s)
 	if signStr == "-" {
 		sign = -1
 	}
@@ -19,15 +19,17 @@ func parseInt(s string) (value Expr, remains string, ok bool) {
 		if !unicode.IsDigit(c) {
 			break
 		}
-		ok = true
 		accum = accum + string(c)
 	}
 	if accum == "" {
 		return 0, s, false
 	}
 
-	n, _ := strconv.Atoi(accum)
-	return sign * n, s[len(accum):], ok
+	n, err := strconv.Atoi(accum)
+	if err != nil {
+		return 0, s, false
+	}
+	return sign * n, s[len(accum):], true
 }
 
 func parseSymbol(s string) (value Expr, remains string, ok bool) {
