@@ -271,6 +271,38 @@ func TestEval(t *testing.T) {
 	})
 
 	// https://stackoverflow.com/questions/526082/in-scheme-whats-the-point-of-set
+
+	t.Run("redefine global scope with set", func(t *testing.T) {
+		// arrange
+		Eval(`
+			(define my-var 21)
+		`)
+		// needed because we check that set modifies
+		// global scope and not local in this case
+		Eval(`
+			(define get-my-var (lambda () my-var))
+		`)
+
+		// act
+		Eval(`(set! my-var (* 2 my-var))`)
+
+		// assert
+		assert.Equal(t, 42, Eval(`(get-my-var)`))
+		assert.Equal(t, 42, Eval(`my-var`))
+	})
+
+	t.Run("do notation (progn)", func(t *testing.T) {
+		// act
+		result := Eval(`
+			(do
+				(set! x 5)
+				(set! x (+ x 1))
+				x)
+`)
+
+		// assert
+		assert.Equal(t, 6, result)
+	})
 }
 
 func assertEval(t *testing.T, prog string) {

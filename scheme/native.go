@@ -14,6 +14,8 @@ func addBultin(env Environment) {
 	env.Global["cdr"] = Builtin(cdrBuiltin)
 	env.Global["list?"] = Builtin(isListBuiltin)
 	env.Global["symbol?"] = Builtin(isSymbolBuiltin)
+	env.Global["do"] = Builtin(doBuiltin)
+	env.Global["set!"] = Builtin(setBuiltin)
 }
 
 func plusBuiltin(args []sexpr.Expr, env Environment) sexpr.Expr {
@@ -70,4 +72,37 @@ func isSymbolBuiltin(args []sexpr.Expr, env Environment) sexpr.Expr {
 	arg := eval(args[0], env)
 	_, ok := arg.(sexpr.Symbol)
 	return ok
+}
+
+func doBuiltin(args []sexpr.Expr, env Environment) sexpr.Expr {
+	result := sexpr.Expr(nil)
+	for _, arg := range args {
+		result = eval(arg, env)
+	}
+	return result
+}
+
+func setBuiltin(args []sexpr.Expr, env Environment) sexpr.Expr {
+	name := args[0].(sexpr.Symbol)
+	value := eval(args[1], env)
+	// global?
+	if _, ok := env.Global[name]; ok {
+		env.Global[name] = value
+		return nil
+	}
+	// local?
+	env.Local[name] = value
+	return nil
+}
+
+// FIXME: maybe change to WithEvalArguments
+// or just introduce defmacro
+func AddFuncToEnv(env Environment, name string, f Builtin) {
+	env.Global[sexpr.Symbol(name)] = Builtin(func(args []sexpr.Expr, env Environment) sexpr.Expr {
+		evaledArgs := make([]sexpr.Expr, 0, len(args))
+		for _, arg := range args {
+			evaledArgs = append(evaledArgs, eval(arg, env))
+		}
+		return f(evaledArgs, env)
+	})
 }
