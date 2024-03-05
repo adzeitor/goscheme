@@ -14,7 +14,7 @@ func TestRunRepl(t *testing.T) {
 		output := bytes.NewBufferString("")
 
 		// act
-		RunRepl(input, output)
+		RunRepl(DefaultEnvironment(), input, output)
 
 		// assert
 		assert.Contains(t, output.String(), "42")
@@ -26,7 +26,7 @@ func TestRunRepl(t *testing.T) {
 		output := bytes.NewBufferString("")
 
 		// act
-		RunRepl(input, output)
+		RunRepl(DefaultEnvironment(), input, output)
 
 		// assert
 		assert.Contains(t, output.String(), "30")
@@ -47,7 +47,7 @@ func TestRunRepl(t *testing.T) {
 		output := bytes.NewBufferString("")
 
 		// act
-		RunRepl(input, output)
+		RunRepl(DefaultEnvironment(), input, output)
 
 		// assert
 		assert.Contains(t, output.String(), "47")
@@ -63,7 +63,7 @@ func TestRunRepl(t *testing.T) {
 		output := bytes.NewBufferString("")
 
 		// act
-		RunRepl(input, output)
+		RunRepl(DefaultEnvironment(), input, output)
 
 		// assert
 		assert.Contains(t, output.String(), "42")

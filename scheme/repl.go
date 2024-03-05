@@ -12,13 +12,16 @@ func scan(scanner *bufio.Scanner) bool {
 	return scanner.Scan()
 }
 
-func RunRepl(input io.Reader, output io.Writer) {
+func RunRepl(
+	env Environment,
+	input io.Reader,
+	output io.Writer,
+) {
 	// FIXME: it is not fully suitable here because newline may break sexpr which
 	// results in parser error.
 	buf := bufio.NewScanner(input)
 
 	var result sexpr.Expr
-	env := DefaultEnvironment()
 	line := ""
 	fmt.Fprint(output, "> ")
 	for scan(buf) {
