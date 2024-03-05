@@ -311,3 +311,27 @@ func assertEval(t *testing.T, prog string) {
 		t.Errorf("evaluation should return true")
 	}
 }
+
+func TestEvalBuffer(t *testing.T) {
+	t.Run("empty", func(t *testing.T) {
+		// act
+		result, _ := EvalBuffer(``, DefaultEnvironment())
+
+		// assert
+		assert.Nil(t, result)
+	})
+
+	t.Run("success", func(t *testing.T) {
+		// act
+		result, _ := EvalBuffer(`
+			(define x 21)
+			(define y 1)
+			(set! y (+ y 1))
+			(* x y)
+`,
+			DefaultEnvironment())
+
+		// assert
+		assert.Equal(t, 42, result)
+	})
+}

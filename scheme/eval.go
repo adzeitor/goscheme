@@ -2,6 +2,7 @@ package scheme
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/adzeitor/goscheme/sexpr"
 )
@@ -34,6 +35,32 @@ func EvalInEnvironment(s string, env Environment) (result sexpr.Expr, resultEnv 
 		return "parse error", env
 	}
 	result = eval(parsed, env)
+	return result, env
+}
+
+func EvalBuffer(s string, env Environment) (result sexpr.Expr, resultEnv Environment) {
+	// FIXME: is exceptions here good idea? Maybe move to repl or exception free code?
+	defer func() {
+		err := recover()
+		if err != nil {
+			result = fmt.Sprintf("exception: %v", err)
+			// FIXME: good?
+			resultEnv = env
+		}
+	}()
+
+	for {
+		if strings.TrimSpace(s) == "" {
+			break
+		}
+
+		parsed, remains, ok := sexpr.Parse(s)
+		if !ok {
+			return "parse error", env
+		}
+		result = eval(parsed, env)
+		s = remains
+	}
 	return result, env
 }
 
