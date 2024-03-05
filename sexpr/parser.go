@@ -33,7 +33,7 @@ func parseInt(s string) (value Expr, remains string, ok bool) {
 }
 
 func parseSymbol(s string) (value Expr, remains string, ok bool) {
-	const allowedSymbolChars = "!+-*=?/abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+	const allowedSymbolChars = "><!+_-*=?/abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 	var accum string
 	for _, c := range []rune(s) {
 		if !strings.ContainsRune(allowedSymbolChars, c) {

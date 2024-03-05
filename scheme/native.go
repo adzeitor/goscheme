@@ -10,6 +10,8 @@ func addBultin(env Environment) {
 	env.Global["+"] = Builtin(plusBuiltin)
 	env.Global["-"] = Builtin(minusBuiltin)
 	env.Global["*"] = Builtin(multBuiltin)
+	env.Global[">"] = Builtin(greaterBuiltin)
+	env.Global["<"] = Builtin(lessBuiltin)
 	env.Global["car"] = Builtin(carBuiltin)
 	env.Global["cdr"] = Builtin(cdrBuiltin)
 	env.Global["list?"] = Builtin(isListBuiltin)
@@ -34,6 +36,18 @@ func multBuiltin(args []sexpr.Expr, env Environment) sexpr.Expr {
 	n1 := eval(args[0], env)
 	n2 := eval(args[1], env)
 	return n1.(int) * n2.(int)
+}
+
+func greaterBuiltin(args []sexpr.Expr, env Environment) sexpr.Expr {
+	n1 := eval(args[0], env)
+	n2 := eval(args[1], env)
+	return n1.(int) > n2.(int)
+}
+
+func lessBuiltin(args []sexpr.Expr, env Environment) sexpr.Expr {
+	n1 := eval(args[0], env)
+	n2 := eval(args[1], env)
+	return n1.(int) < n2.(int)
 }
 
 func carBuiltin(args []sexpr.Expr, env Environment) sexpr.Expr {
